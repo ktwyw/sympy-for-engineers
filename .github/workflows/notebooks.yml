@@ -1,0 +1,28 @@
+name: notebooks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 6 1 * *"   # monthly, to catch breakage from new SymPy, NumPy or SciPy releases
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - run: pip install -r requirements-dev.txt
+      # Executes every notebook and solution from top to bottom; any failed assert fails the build.
+      - run: pytest --nbmake --nbmake-timeout=600 notebooks/ solutions/

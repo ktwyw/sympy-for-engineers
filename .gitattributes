@@ -1,0 +1,4 @@
+* text=auto eol=lf
+*.ipynb text eol=lf
+*.gif binary
+*.png binary
